@@ -45,7 +45,7 @@ bool TripAnalyzer::split6(const string& line, string out[6]) {
     return true;
 }
 
-void TripAnalyzer::ingestFile(const std::string& csvPath) {
+void TripAnalyzer::ingestFile(const string& csvPath) {
     zoneCounts.clear();
     slotCounts.clear();
 
@@ -54,8 +54,11 @@ void TripAnalyzer::ingestFile(const std::string& csvPath) {
 
     string line;
     while (getline(file, line)) {
+        if (!line.empty() && line.back() == '\r') line.pop_back(); 
         string col[6];
         if (!split6(line, col)) continue;
+
+        if (col[0] == "TripID" || col[1] == "PickupZoneID" || col[3] == "PickupDateTime") continue;
 
         const string& pickupZone = col[1];
         const string& pickupDT   = col[3];
@@ -66,11 +69,10 @@ void TripAnalyzer::ingestFile(const std::string& csvPath) {
         if (!parseHour(pickupDT, hour)) continue;
 
         zoneCounts[pickupZone]++;
-
-        string key = pickupZone + "|" + to_string(hour);
-        slotCounts[key]++;
+        slotCounts[pickupZone + "|" + to_string(hour)]++;
     }
 }
+
 
 vector<ZoneCount> TripAnalyzer::topZones(int k) const {
     vector<ZoneCount> v;
@@ -123,6 +125,7 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
 
 
 
