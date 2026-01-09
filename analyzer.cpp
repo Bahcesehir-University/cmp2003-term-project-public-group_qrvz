@@ -13,18 +13,18 @@ bool TripAnalyzer::parseHour(const string& dt, int& hour) {
     if (sep == string::npos) return false;
 
     size_t i = sep + 1;
-    while (i < dt.size() && dt[i] == ' ') i++;
+    while (i < dt.size() && (dt[i] == ' ' || dt[i] == '"')) i++;
 
     int h = 0;
     int digits = 0;
-    while (i < dt.size() && digits < 2 && isdigit(static_cast<unsigned char>(dt[i]))) {
+    while (i < dt.size() && digits < 2 && isdigit((unsigned char)dt[i])) {
         h = h * 10 + (dt[i] - '0');
         i++;
         digits++;
     }
 
     if (digits == 0) return false;
-    if (i >= dt.size() || dt[i] != ':') return false; 
+    if (i >= dt.size() || dt[i] != ':') return false;
     if (h < 0 || h > 23) return false;
 
     hour = h;
@@ -45,7 +45,7 @@ bool TripAnalyzer::split6(const string& line, string out[6]) {
     return true;
 }
 
-void TripAnalyzer::ingestFile(const std::string& csvPath) {
+void TripAnalyzer::ingestFile(const string& csvPath) {
     zoneCounts.clear();
     slotCounts.clear();
 
@@ -128,6 +128,7 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
 
 
 
