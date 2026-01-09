@@ -5,15 +5,12 @@
 #include <cctype>
 #include <vector>
 
-void trimInPlace(string& s) {
+static inline void trimInPlace(string& s) {
     size_t a = 0;
     while (a < s.size() && isspace((unsigned char)s[a])) a++;
-
     size_t b = s.size();
     while (b > a && isspace((unsigned char)s[b - 1])) b--;
-
     s = s.substr(a, b - a);
-
     if (s.size() >= 2 && s.front() == '"' && s.back() == '"') {
         s = s.substr(1, s.size() - 2);
     }
@@ -78,7 +75,7 @@ void TripAnalyzer::ingestFile(const std::string& csvPath) {
         if (col[0] == "TripID") continue;
 
         const string& pickupZone = col[1];
-        const string& pickupDT   = col[3];
+        const string& pickupDT = col[3];
 
         if (pickupZone.empty() || pickupDT.empty()) continue;
 
@@ -139,6 +136,7 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = (k <= 0) ? 0 : min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
 
 
 
