@@ -17,7 +17,7 @@ struct SlotCount {
 
 class TripAnalyzer {
 public:
-    void ingestFile(const std::string& csvPath);
+    void ingestFile(const string& csvPath);
 
     vector<ZoneCount> topZones(int k = 10) const;
     vector<SlotCount> topBusySlots(int k = 10) const;
@@ -28,3 +28,4 @@ public:
     bool parseHour(const string& dt, int& hour);
     bool split6(const string& line, string out[6]);
 };
+
