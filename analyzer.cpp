@@ -8,25 +8,27 @@
 using namespace std;
 
 bool TripAnalyzer::parseHour(const string& dt, int& hour) {
-    size_t sep = dt.find(' ');
-    if (sep == string::npos) sep = dt.find('T');
-    if (sep == string::npos) return false;
+    size_t colon = dt.find(':');
+    if (colon == string::npos) return false;
 
-    size_t i = sep + 1;
-    while (i < dt.size() && (dt[i] == ' ' || dt[i] == '"')) i++;
+    size_t j = colon;
+    while (j > 0 && (dt[j - 1] == ' ' || dt[j - 1] == '"')) j--;
 
-    int h = 0;
+    size_t start = j;
     int digits = 0;
-    while (i < dt.size() && digits < 2 && isdigit((unsigned char)dt[i])) {
-        h = h * 10 + (dt[i] - '0');
-        i++;
+    while (start > 0 && digits < 2 && isdigit((unsigned char)dt[start - 1])) {
+        start--;
         digits++;
     }
 
     if (digits == 0) return false;
-    if (i >= dt.size() || dt[i] != ':') return false;
-    if (h < 0 || h > 23) return false;
 
+    int h = 0;
+    for (size_t t = start; t < j; t++) {
+        h = h * 10 + (dt[t] - '0');
+    }
+
+    if (h < 0 || h > 23) return false;
     hour = h;
     return true;
 }
@@ -125,6 +127,7 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
 
 
 
