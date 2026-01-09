@@ -4,6 +4,8 @@
 #include <fstream>
 #include <algorithm>
 
+using namespace std;
+
 bool TripAnalyzer::parseHour(const string& dt, int& hour) {
     if (dt.size() < 16) return false;   
 
@@ -115,4 +117,5 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
 
