@@ -1,4 +1,6 @@
 #include "analyzer.h"
+#include <vector>
+#include <string>
 #include <fstream>
 #include <algorithm>
 
@@ -113,3 +115,4 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
