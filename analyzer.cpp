@@ -20,13 +20,10 @@ bool TripAnalyzer::parseHour(const string& dt, int& hour) {
         start--;
         digits++;
     }
-
     if (digits == 0) return false;
 
     int h = 0;
-    for (size_t t = start; t < j; t++) {
-        h = h * 10 + (dt[t] - '0');
-    }
+    for (size_t t = start; t < j; t++) h = h * 10 + (dt[t] - '0');
 
     if (h < 0 || h > 23) return false;
     hour = h;
@@ -40,10 +37,13 @@ bool TripAnalyzer::split6(const string& line, string out[6]) {
     while (i < 5) {
         size_t comma = line.find(',', start);
         if (comma == string::npos) return false;
-        out[i++] = line.substr(start, comma - start);
+        out[i] = line.substr(start, comma - start);
+        trimInPlace(out[i]);
+        i++;
         start = comma + 1;
     }
     out[i] = line.substr(start);
+    trimInPlace(out[i]);
     return true;
 }
 
@@ -127,6 +127,7 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
 
 
 
