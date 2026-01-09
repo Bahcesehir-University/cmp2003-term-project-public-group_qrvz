@@ -3,19 +3,31 @@
 #include <string>
 #include <fstream>
 #include <algorithm>  
+#include <cctype>
 
 using namespace std;
 
 bool TripAnalyzer::parseHour(const string& dt, int& hour) {
-    if (dt.size() < 16) return false;   
+    size_t sep = dt.find(' ');
+    if (sep == string::npos) sep = dt.find('T');
+    if (sep == string::npos) return false;
 
-    char h1 = dt[11], h2 = dt[12];
-    if (h1 < '0' || h1 > '9') return false;
-    if (h2 < '0' || h2 > '9') return false;
+    size_t i = sep + 1;
+    while (i < dt.size() && dt[i] == ' ') i++;
 
-    hour = (h1 - '0') * 10 + (h2 - '0');
-    if (hour < 0 || hour > 23) return false;
+    int h = 0;
+    int digits = 0;
+    while (i < dt.size() && digits < 2 && isdigit(static_cast<unsigned char>(dt[i]))) {
+        h = h * 10 + (dt[i] - '0');
+        i++;
+        digits++;
+    }
 
+    if (digits == 0) return false;
+    if (i >= dt.size() || dt[i] != ':') return false; 
+    if (h < 0 || h > 23) return false;
+
+    hour = h;
     return true;
 }
 
@@ -116,6 +128,7 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
 
 
 
