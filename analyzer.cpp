@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <algorithm>
+#include <algorithm>  
 
 using namespace std;
 
@@ -34,19 +34,19 @@ bool TripAnalyzer::split6(const string& line, string out[6]) {
 }
 
 void TripAnalyzer::ingestFile(const std::string& csvPath) {
-        ifstream file(csvPath);
-    if (!file.is_open()) {
+    zoneCounts.clear();
+    slotCounts.clear();
 
-        return;
-    }
+    ifstream file(csvPath);
+    if (!file.is_open()) return;
 
     string line;
 
+    if (!getline(file, line)) return;
+
     while (getline(file, line)) {
         string col[6];
-        if (!split6(line, col)) {
-            continue; 
-        }
+        if (!split6(line, col)) continue;
 
         const string& pickupZone = col[1];
         const string& pickupDT = col[3];
@@ -54,9 +54,7 @@ void TripAnalyzer::ingestFile(const std::string& csvPath) {
         if (pickupZone.empty()) continue;
 
         int hour = -1;
-        if (!parseHour(pickupDT, hour)) {
-            continue;
-        }
+        if (!parseHour(pickupDT, hour)) continue;
 
         zoneCounts[pickupZone]++;
 
@@ -64,6 +62,7 @@ void TripAnalyzer::ingestFile(const std::string& csvPath) {
         slotCounts[key]++;
     }
 }
+
 
 
 vector<ZoneCount> TripAnalyzer::topZones(int k) const {
@@ -117,5 +116,6 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
 
 
