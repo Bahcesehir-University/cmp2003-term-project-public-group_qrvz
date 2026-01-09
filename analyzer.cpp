@@ -30,6 +30,16 @@ bool TripAnalyzer::parseHour(const string& dt, int& hour) {
     return true;
 }
 
+void trimInPlace(string& s) {
+    size_t a = 0;
+    while (a < s.size() && isspace((unsigned char)s[a])) a++;
+    size_t b = s.size();
+    while (b > a && isspace((unsigned char)s[b - 1])) b--;
+    s = s.substr(a, b - a);
+    if (s.size() >= 2 && s.front() == '"' && s.back() == '"')
+        s = s.substr(1, s.size() - 2);
+}
+
 bool TripAnalyzer::split6(const string& line, string out[6]) {
     int i = 0;
     size_t start = 0;
@@ -127,6 +137,7 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
 
 
 
