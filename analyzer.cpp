@@ -45,7 +45,7 @@ bool TripAnalyzer::split6(const string& line, string out[6]) {
     return true;
 }
 
-void TripAnalyzer::ingestFile(const string& csvPath) {
+void TripAnalyzer::ingestFile(const std::string& csvPath) {
     zoneCounts.clear();
     slotCounts.clear();
 
@@ -53,15 +53,12 @@ void TripAnalyzer::ingestFile(const string& csvPath) {
     if (!file.is_open()) return;
 
     string line;
-
-    if (!getline(file, line)) return;
-
     while (getline(file, line)) {
         string col[6];
         if (!split6(line, col)) continue;
 
         const string& pickupZone = col[1];
-        const string& pickupDT = col[3];
+        const string& pickupDT   = col[3];
 
         if (pickupZone.empty()) continue;
 
@@ -74,8 +71,6 @@ void TripAnalyzer::ingestFile(const string& csvPath) {
         slotCounts[key]++;
     }
 }
-
-
 
 vector<ZoneCount> TripAnalyzer::topZones(int k) const {
     vector<ZoneCount> v;
@@ -128,6 +123,7 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
 
 
 
