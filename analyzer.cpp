@@ -4,36 +4,8 @@
 #include <vector>
 #include <fstream>
 #include <algorithm>
-#include <cctype>
 
 using namespace std;
-
- void trimInPlace(string& s) {
-    size_t a = 0;
-    while (a < s.size() && isspace((unsigned char)s[a])) a++;
-    size_t b = s.size();
-    while (b > a && isspace((unsigned char)s[b - 1])) b--;
-    s = s.substr(a, b - a);
-    if (s.size() >= 2 && s.front() == '"' && s.back() == '"') {
-        s = s.substr(1, s.size() - 2);
-    }
-}
-
-static bool split3(const string& line, string out[3]) {
-    size_t p0 = line.find(',');
-    if (p0 == string::npos) return false;
-    size_t p1 = line.find(',', p0 + 1);
-    if (p1 == string::npos) return false;
-
-    out[0] = line.substr(0, p0);
-    out[1] = line.substr(p0 + 1, p1 - (p0 + 1));
-    out[2] = line.substr(p1 + 1);
-
-    trimInPlace(out[0]);
-    trimInPlace(out[1]);
-    trimInPlace(out[2]);
-    return true;
-}
 
 bool TripAnalyzer::parseHour(const string& dt, int& hour) {
     size_t sep = dt.find(' ');
@@ -45,8 +17,11 @@ bool TripAnalyzer::parseHour(const string& dt, int& hour) {
 
     int h = 0;
     int digits = 0;
-    while (i < dt.size() && digits < 2 && isdigit((unsigned char)dt[i])) {
-        h = h * 10 + (dt[i] - '0');
+
+    while (i < dt.size() && digits < 2) {
+        char c = dt[i];
+        if (c < '0' || c > '9') break;
+        h = h * 10 + (c - '0');
         i++;
         digits++;
     }
@@ -60,18 +35,22 @@ bool TripAnalyzer::parseHour(const string& dt, int& hour) {
 }
 
 bool TripAnalyzer::split6(const string& line, string out[6]) {
+    for (int j = 0; j < 6; ++j) out[j].clear();
+
     int i = 0;
     size_t start = 0;
 
     while (i < 5) {
         size_t comma = line.find(',', start);
-        if (comma == string::npos) return false;
+        if (comma == string::npos) {
+            out[i++] = line.substr(start);
+            return true; // 3 kolon da dahil, daha az kolon kabul
+        }
         out[i++] = line.substr(start, comma - start);
         start = comma + 1;
     }
-    out[i] = line.substr(start);
 
-    for (int j = 0; j < 6; ++j) trimInPlace(out[j]);
+    out[i] = line.substr(start);
     return true;
 }
 
@@ -86,27 +65,20 @@ void TripAnalyzer::ingestFile(const string& csvPath) {
     while (getline(file, line)) {
         if (!line.empty() && line.back() == '\r') line.pop_back();
 
-        int commaCount = 0;
-        for (char ch : line) if (ch == ',') commaCount++;
+        string col[6];
+        if (!split6(line, col)) continue;
+        if (col[0] == "TripID") continue;
 
         string zone, dt;
 
-        if (commaCount == 2) {
-            string c3[3];
-            if (!split3(line, c3)) continue;
-
-            if (c3[0] == "TripID" || c3[1] == "PickupZoneID") continue;
-
-            zone = c3[1];
-            dt   = c3[2];
-        } else if (commaCount >= 5) {
-            string c6[6];
-            if (!split6(line, c6)) continue;
-
-            if (c6[0] == "TripID" || c6[1] == "PickupZoneID") continue;
-
-            zone = c6[1];
-            dt   = c6[3];
+        if (!col[2].empty() && col[3].empty()) {
+            zone = col[1];
+            dt   = col[2];
+        }
+       
+        else if (!col[3].empty()) {
+            zone = col[1];
+            dt   = col[3];
         } else {
             continue;
         }
@@ -170,6 +142,7 @@ vector<SlotCount> TripAnalyzer::topBusySlots(int k) const {
     size_t take = (k <= 0) ? 0 : min((size_t)k, v.size());
     return vector<SlotCount>(v.begin(), v.begin() + take);
 }
+
 
 
 
