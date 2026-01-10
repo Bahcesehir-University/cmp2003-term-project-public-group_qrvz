@@ -18,7 +18,7 @@ int main() {
     auto t0 = std::chrono::high_resolution_clock::now();
 
     TripAnalyzer analyzer;
-    analyzer.ingestFile("Trips.csv");
+    analyzer.ingestFile("SmallTrips.csv");
 
     printZones(analyzer.topZones(10));
     printSlots(analyzer.topBusySlots(10));
@@ -29,4 +29,5 @@ int main() {
     std::cout << "EXEC_MS\n" << ms << "\n";
     return 0;
 }
+
 
